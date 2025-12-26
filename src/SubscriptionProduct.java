@@ -2,9 +2,9 @@ public class SubscriptionProduct extends Product{
     int months;
     boolean autoRenew;
 
-    SubscriptionProduct(long id, String name, double basePrice, String category,
+    SubscriptionProduct(String sku, long id, String name, double basePrice, String category,
                         int months, boolean autoRenew) {
-        super(id, name, basePrice, category);
+        super(sku, id, name, basePrice, category);
         this.months = months;
         this.autoRenew = autoRenew;
     }

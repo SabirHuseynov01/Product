@@ -2,9 +2,9 @@ public class PhysicalProduct extends Product{
     double weightKQ;
     boolean isFragile;
 
-    PhysicalProduct(long id, String name, double basePrice, String category,
+    PhysicalProduct(String sku, long id, String name, double basePrice, String category,
                     double weightKQ, boolean isFragile) {
-        super(id, name, basePrice, category);
+        super(sku, id, name, basePrice, category);
         this.weightKQ = weightKQ;
         this.isFragile = isFragile;
     }
