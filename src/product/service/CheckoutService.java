@@ -1,5 +1,7 @@
 package product.service;
 
+import product.interface1.Discountable;
+import product.interface1.Shippable;
 import product.model.DigitalProduct;
 import product.model.PhysicalProduct;
 import product.model.Product;
@@ -36,5 +38,21 @@ public class CheckoutService {
             applySpecialRules(product);
         }
         System.out.println("Total: " + card.totalPrice());
+    }
+
+    public void printExtraInfo(Product product) {
+        System.out.println("\n=== Extra info for: " + product.sku + " === ");
+
+        if (product instanceof Discountable) {
+            Discountable discountable = (Discountable) product;
+            double discountPrice = discountable.applyDiscount(10);
+            System.out.println("%10 discount applied: " + discountPrice + " AZN");
+        }
+
+        if (product instanceof Shippable) {
+            Shippable shippable = (Shippable) product;
+            double shippingPrice = shippable.shippingCost();
+            System.out.println("Shipping cost: " + shippable.shippingCost() + " AZN");
+        }
     }
 }

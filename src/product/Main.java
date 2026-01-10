@@ -1,5 +1,6 @@
 package product;
 
+import product.interface1.Discountable;
 import product.model.DigitalProduct;
 import product.model.PhysicalProduct;
 import product.model.Product;
@@ -37,17 +38,53 @@ public class Main {
         card.add(d5);
         card.add(giftCard);
 
+        System.out.println("========== PRODUCT LIST ==========");
         card.printAll();
 
+        System.out.println("\n========== CHECKOUT PROCESS ==========");
         CheckoutService checkoutService = new CheckoutService();
         checkoutService.processOrder(card);
 
-        Product product = new Product("PRD-2001", 2001, "Sample Product", 100,
-                "Sample Category");
+        System.out.println("\n========== TYPE & DISCOUNT TEST ==========");
+        Product[] allProducts = {d1, d2, d3, d4, d5, giftCard};
+
+        for (Product product : allProducts) {
+            System.out.println("\nProduct: " + product.sku);
+            System.out.println("Type: " + product.getType());
+
+            if (product instanceof Discountable) {
+                Discountable discountable = (Discountable) product;
+                System.out.println("10% Discount: " + discountable.applyDiscount(10) + " AZN");
+            }else {
+                System.out.println("No discount available");
+            }
+        }
+
+        System.out.println("\n========== EXTRA INFO TEST ==========");
+        for (Product product : allProducts) {
+            checkoutService.printExtraInfo(product);
+        }
+
+
+        System.out.println("\n========== MANUAL CAST DEMO ==========");
+        Product product = new DigitalProduct("PRD-2001", 2001, "Test Digital Product", 100,
+                "Software", 500, "Business", "Windows");
+        Discountable discountable = (Discountable) product;
+        System.out.println("%5 discount applied: " + discountable.applyDiscount(5) + " AZN");
+
+        Product product1 = new Product("PRD-2001", 2001, "Sample Product", 100,
+                "Sample Category") {
+            @Override
+            public String getType() {
+                return "SAMPLE";
+            }
+        };
 
         if (product instanceof PhysicalProduct) {
             PhysicalProduct physicalProduct = (PhysicalProduct) product;
             System.out.println("Manual cast demo -> fragile? " + physicalProduct.isFragile);
+        }else {
+            System.out.println("This product is not physical");
         }
     }
 }

@@ -1,6 +1,8 @@
 package product.model;
 
-public class DigitalProduct extends Product {
+import product.interface1.Discountable;
+
+public class DigitalProduct extends Product implements Discountable {
     double fileSizeMB;
     public String licenseType;
     String platform;
@@ -22,5 +24,15 @@ public class DigitalProduct extends Product {
 
     public String label() {
         return "Digital Product: " + name + " | " + licenseType;
+    }
+
+    @Override
+    public String getType() {
+        return "DIGITAL";
+    }
+
+    @Override
+    public double applyDiscount(double percent) {
+        return finalPrice() * (1 - percent / 100.0);
     }
 }

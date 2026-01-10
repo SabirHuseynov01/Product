@@ -10,12 +10,18 @@ public final class GiftCard extends Product {
         this.amount = amount;
     }
 
-    double finalPrice() {
+    @Override
+    public double finalPrice() {
         return amount;
     }
 
-    String label() {
+    @Override
+    public String label() {
         return "Gift Card: " + amount;
     }
-}
 
+    @Override
+    public String getType() {
+        return "GIFT_CARD";
+    }
+}

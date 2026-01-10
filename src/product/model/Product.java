@@ -1,6 +1,6 @@
 package product.model;
 
-public class Product {
+public abstract class Product {
     public final String sku;
     long id;
     String name;
@@ -36,6 +36,8 @@ public class Product {
     public String label() {
         return "Product: " + name + " | " + category;
     }
+
+    public abstract String getType();
 
     public String toString() {
         return "sku=" + sku +

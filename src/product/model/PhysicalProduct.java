@@ -1,6 +1,9 @@
 package product.model;
 
-public class PhysicalProduct extends Product {
+import product.interface1.Discountable;
+import product.interface1.Shippable;
+
+public class PhysicalProduct extends Product implements Shippable, Discountable {
     double weightKQ;
     public boolean isFragile;
 
@@ -16,6 +19,11 @@ public class PhysicalProduct extends Product {
             return basePrice + 7; //Paketlenme miqdari
         }
         return basePrice;
+    }
+
+    @Override
+    public String getType() {
+        return "PHYSICAL";
     }
 
     double finalPrice(double discountPercent, String city) {
@@ -36,5 +44,21 @@ public class PhysicalProduct extends Product {
             total += 2; //Ekstra paketlenme miqdari
         }
         return total;
+    }
+
+    @Override
+    public double applyDiscount(double percent) {
+        return finalPrice() * (1 - percent / 100.0);
+    }
+
+    @Override
+    public double shippingCost() {
+        if (weightKQ <= 1) {
+            return 3;
+        } else if (weightKQ <= 5) {
+           return 6;
+        }else {
+            return 10;
+        }
     }
 }
