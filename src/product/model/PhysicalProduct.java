@@ -1,17 +1,26 @@
 package product.model;
 
+import product.exceptions.InvalidDiscountException;
 import product.interface1.Discountable;
 import product.interface1.Shippable;
 
 public class PhysicalProduct extends Product implements Shippable, Discountable {
-    double weightKQ;
-    public boolean isFragile;
+    private double weightKQ;
+    private boolean isFragile;
 
     public PhysicalProduct(String sku, long id, String name, double basePrice, String category,
-                           double weightKQ, boolean isFragile) {
-        super(sku, id, name, basePrice, category);
+                           double weightKQ, boolean isFragile,int stock) {
+        super(sku, id, name, basePrice, category, stock);
         this.weightKQ = weightKQ;
         this.isFragile = isFragile;
+    }
+
+    public double getWeightKQ() {
+        return weightKQ;
+    }
+
+    public boolean isFragile() {
+        return isFragile;
     }
 
     public double finalPrice() {
@@ -48,6 +57,9 @@ public class PhysicalProduct extends Product implements Shippable, Discountable 
 
     @Override
     public double applyDiscount(double percent) {
+        if (percent < 0 || percent > 80) {
+            throw new InvalidDiscountException("Discount out of range: " + percent);
+        }
         return finalPrice() * (1 - percent / 100.0);
     }
 

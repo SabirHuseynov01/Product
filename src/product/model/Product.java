@@ -1,18 +1,42 @@
 package product.model;
 
+import product.exceptions.InvalidSkuException;
+import product.exceptions.OutOfStockException;
+
 public abstract class Product {
     public final String sku;
-    long id;
-    String name;
-    double basePrice;
-    String category;
+    protected long id;
+    protected String name;
+    protected double basePrice;
+    protected String category;
+    private int stock;
 
-    public Product(String sku, long id, String name, double basePrice, String category) {
+    public Product(String sku, long id, String name, double basePrice, String category, int stock) {
+
+        if (sku == null || sku.isEmpty()) {
+            throw new InvalidSkuException("SKU is empty");
+        }
+
+        if (!sku.startsWith("PRD-")) {
+            throw new InvalidSkuException("SKU format is invalid: " + sku);
+        }
+
+        String afterPrefix = sku.substring(4);
+        if (afterPrefix.isEmpty() || !afterPrefix.matches("\\d+")){
+            throw new InvalidSkuException("SKU format is invalid: " + sku);
+        }
+
+        //Stock validation
+        if (stock < 0) {
+            throw new RuntimeException("Stock cannot be negative");
+        }
+
         this.sku = sku;
         this.id = id;
         this.name = name;
         this.basePrice = basePrice;
         this.category = category;
+        this.stock = stock;
     }
 
     public final String shortInfo() {
@@ -37,6 +61,22 @@ public abstract class Product {
         return "Product: " + name + " | " + category;
     }
 
+    public int getStock() {
+        return stock;
+    }
+
+    public void reserve(int count) {
+        if (count <= 0){
+            throw new RuntimeException("Reserve count must be positive");
+        }
+
+        if (stock < count){
+            throw new OutOfStockException("Not enough stock for " + sku +
+                    " . requested=" + count + " , available=" + stock);
+        }
+        stock = stock - count;
+    }
+
     public abstract String getType();
 
     public String toString() {
@@ -45,6 +85,8 @@ public abstract class Product {
                 " name=" + name +
                 " category=" + category +
                 " basePrice=" + basePrice +
+                " stock=" + stock +
                 " finalPrice='" + finalPrice();
     }
+
 }

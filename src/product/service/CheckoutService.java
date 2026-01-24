@@ -1,5 +1,7 @@
 package product.service;
 
+import product.exceptions.InvalidDiscountException;
+import product.exceptions.OutOfStockException;
 import product.interface1.Discountable;
 import product.interface1.Shippable;
 import product.model.DigitalProduct;
@@ -11,13 +13,13 @@ public class CheckoutService {
     void applySpecialRules(Product product) {
         if (product instanceof PhysicalProduct) {
             PhysicalProduct physicalProduct = (PhysicalProduct) product;
-            if (physicalProduct.isFragile) {
+            if (physicalProduct.isFragile()) {
                 System.out.println("Fragile handling applied for " + physicalProduct.sku);
             }
 
         } else if (product instanceof DigitalProduct) {
             DigitalProduct digitalProduct = (DigitalProduct) product;
-            if ("BUSINESS".equalsIgnoreCase(digitalProduct.licenseType)) {
+            if ("BUSINESS".equalsIgnoreCase(digitalProduct.getLicenseType())) {
                 System.out.println("Business license verified for " + digitalProduct.sku);
             }
 
@@ -32,21 +34,49 @@ public class CheckoutService {
             System.out.println("Gift card ready to redeem " + giftCard.amount + " for " + giftCard.sku);
         }
     }
-    public void processOrder(Card card) {
+
+    public void processCard(Card card) {
+        System.out.println("\n === Checkout Process ===");
+
         for (int i = 0; i < card.size; i++) {
             Product product = card.items[i];
-            applySpecialRules(product);
+
+            try {
+                product.reserve(1);
+                System.out.println("Reserved for " + product.sku);
+
+                applySpecialRules(product);
+
+                printExtraInfo(product);
+
+                if (product instanceof Discountable) {
+                    Discountable discountable = (Discountable) product;
+                    double discountedPrice = discountable.applyDiscount(10);
+                    System.out.println("Discounted price for " + discountedPrice + " AZN");
+                }
+                System.out.println("---");
+
+            }catch (OutOfStockException e) {
+                System.out.println("Out of stock: " + e.getMessage());
+                System.out.println("---");
+
+            }catch (InvalidDiscountException e) {
+                System.out.println("Discount error: " + e.getMessage());
+                System.out.println("---");
+            }catch (RuntimeException e) {
+                System.out.println("Runtime error: " + e.getMessage());
+                System.out.println("---");
+            }
         }
-        System.out.println("Total: " + card.totalPrice());
+        System.out.println("Total: " + card.totalPrice() + " AZN");
     }
 
+
     public void printExtraInfo(Product product) {
-        System.out.println("\n=== Extra info for: " + product.sku + " === ");
+        System.out.println("\n=== Extra info for: " + product.sku);
 
         if (product instanceof Discountable) {
-            Discountable discountable = (Discountable) product;
-            double discountPrice = discountable.applyDiscount(10);
-            System.out.println("%10 discount applied: " + discountPrice + " AZN");
+            System.out.println("- Supports discount");
         }
 
         if (product instanceof Shippable) {

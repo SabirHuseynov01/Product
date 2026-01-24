@@ -7,10 +7,16 @@ public class Card {
     int size = 0;
 
     public void add(Product item) {
-        if (size < items.length) {
-            items[size] = item;
-            size++;
+        if (item == null) {
+            throw new RuntimeException("Product is null");
         }
+
+        if (size >= items.length) {
+            throw new RuntimeException("Card is Full");
+        }
+
+        items[size] = item;
+        size++;
     }
 
     double totalPrice() {

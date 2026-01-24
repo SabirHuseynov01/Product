@@ -1,18 +1,31 @@
 package product.model;
 
+import product.exceptions.InvalidDiscountException;
 import product.interface1.Discountable;
 
 public class DigitalProduct extends Product implements Discountable {
-    double fileSizeMB;
-    public String licenseType;
-    String platform;
+    private double fileSizeMB;
+    private String licenseType;
+    private String platform;
 
     public DigitalProduct(String sku, long id, String name, double basePrice, String category,
-                          double fileSizeMB, String licenseType, String platform) {
-        super(sku,id, name, basePrice, category);
+                          double fileSizeMB, String licenseType, String platform, int stock) {
+        super(sku,id, name, basePrice, category, stock);
         this.fileSizeMB = fileSizeMB;
         this.licenseType = licenseType;
         this.platform = platform;
+    }
+
+    public double getFileSizeMB() {
+        return fileSizeMB;
+    }
+
+    public String getLicenseType() {
+        return licenseType;
+    }
+
+    public String getPlatform() {
+        return platform;
     }
 
     public double finalPrice() {
@@ -33,6 +46,9 @@ public class DigitalProduct extends Product implements Discountable {
 
     @Override
     public double applyDiscount(double percent) {
+        if (percent < 0 || percent > 80) {
+            throw new InvalidDiscountException("Discount out of range: " + percent);
+        }
         return finalPrice() * (1 - percent / 100.0);
     }
 }

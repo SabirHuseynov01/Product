@@ -1,5 +1,6 @@
 package product.model;
 
+import product.exceptions.InvalidDiscountException;
 import product.interface1.Discountable;
 
 public class SubscriptionProduct extends Product implements Discountable {
@@ -7,8 +8,8 @@ public class SubscriptionProduct extends Product implements Discountable {
     public boolean autoRenew;
 
     public SubscriptionProduct(String sku, long id, String name, double basePrice, String category,
-                               int months, boolean autoRenew) {
-        super(sku, id, name, basePrice, category);
+                               int months, boolean autoRenew, int stock) {
+        super(sku, id, name, basePrice, category, stock);
         this.months = months;
         this.autoRenew = autoRenew;
     }
@@ -36,6 +37,9 @@ public class SubscriptionProduct extends Product implements Discountable {
 
     @Override
     public double applyDiscount(double percent) {
+        if (percent < 0 || percent > 80) {
+            throw new InvalidDiscountException("Discount out of range: " + percent);
+        }
         return finalPrice() * (1 - percent / 100.0);
     }
 }
