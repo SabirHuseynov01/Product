@@ -1,7 +1,7 @@
 package product.model;
 
 import product.exceptions.InvalidDiscountException;
-import product.interface1.Discountable;
+import product.interfaces.Discountable;
 
 public class DigitalProduct extends Product implements Discountable {
     private double fileSizeMB;

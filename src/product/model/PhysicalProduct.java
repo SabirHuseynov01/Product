@@ -1,8 +1,8 @@
 package product.model;
 
 import product.exceptions.InvalidDiscountException;
-import product.interface1.Discountable;
-import product.interface1.Shippable;
+import product.interfaces.Discountable;
+import product.interfaces.Shippable;
 
 public class PhysicalProduct extends Product implements Shippable, Discountable {
     private double weightKQ;

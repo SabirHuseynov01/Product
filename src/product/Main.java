@@ -2,7 +2,9 @@ package product;
 
 import product.exceptions.InvalidDiscountException;
 import product.exceptions.InvalidSkuException;
-import product.interface1.Discountable;
+import product.exceptions.InvoiceFileNotException;
+import product.exceptions.InvoiceReadException;
+import product.interfaces.Discountable;
 import product.model.DigitalProduct;
 import product.model.PhysicalProduct;
 import product.model.Product;
@@ -187,8 +189,42 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
 
+    static void testInvoiceOperations() {
+        CheckoutService checkoutService = new CheckoutService();
 
+        System.out.println("Test 1: File does not exist");
+        System.out.println("---------------------------");
+
+        try {
+            processInvoice("nonexistent_invoice.txt", checkoutService);
+        } catch (Exception e) {
+            System.out.println("Unexcepted error in main: " + e.getMessage());
+        }
+
+        System.out.println("\nTest 2: File with invalid path");
+        System.out.println("----------------------------");
+        try {
+            processInvoice("/invalid/path/invoice.txt", checkoutService);
+        } catch (Exception e) {
+            System.out.println("Unexcepted error in main: " + e.getMessage());
+        }
+
+        System.out.println("\nTest 3: Valid invoice file");
+        System.out.println("----------------------------");
+        try {
+            processInvoice("invoice.txt", checkoutService);
+        } catch (Exception e) {
+            System.out.println("Unexcepted error in main: " + e.getMessage());
+        }
+    }
+
+    static void processInvoice(String filePath, CheckoutService service)
+            throws InvoiceReadException, InvoiceFileNotException {
+
+        System.out.println("Processing invoice: " + filePath);
+        service.printInvoice(filePath);
     }
 }
 

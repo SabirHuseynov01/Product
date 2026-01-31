@@ -1,4 +1,4 @@
-package product.interface1;
+package product.interfaces;
 
 public interface Shippable {
     double shippingCost();

@@ -1,9 +1,11 @@
 package product.service;
 
 import product.exceptions.InvalidDiscountException;
+import product.exceptions.InvoiceFileNotException;
+import product.exceptions.InvoiceReadException;
 import product.exceptions.OutOfStockException;
-import product.interface1.Discountable;
-import product.interface1.Shippable;
+import product.interfaces.Discountable;
+import product.interfaces.Shippable;
 import product.model.DigitalProduct;
 import product.model.PhysicalProduct;
 import product.model.Product;
@@ -83,6 +85,28 @@ public class CheckoutService {
             Shippable shippable = (Shippable) product;
             double shippingPrice = shippable.shippingCost();
             System.out.println("Shipping cost: " + shippable.shippingCost() + " AZN");
+        }
+    }
+    public void printInvoice(String filePath){
+        InvoiceService invoiceService = new InvoiceService();
+
+        try {
+            String invoiceContent = invoiceService.readInvoice(filePath);
+            System.out.println("\n---- Invoice ----");
+            System.out.println(invoiceContent);
+            System.out.println("--------");
+
+        }catch (InvoiceFileNotException e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Please try again. ");
+
+        }catch (InvoiceReadException e){
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("File locked. ");
+
+            if (e.getCause() != null) {
+                System.out.println("Cause: " + e.getCause().getMessage());
+            }
         }
     }
 }

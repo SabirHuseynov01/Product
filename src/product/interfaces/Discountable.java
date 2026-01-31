@@ -1,4 +1,4 @@
-package product.interface1;
+package product.interfaces;
 
 public interface Discountable {
     double applyDiscount(double percent);
