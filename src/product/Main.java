@@ -1,5 +1,9 @@
 package product;
 
+import product.enums.Cities;
+import product.enums.LicenseType;
+import product.enums.Platforms;
+import product.enums.ProductCategory;
 import product.exceptions.InvalidDiscountException;
 import product.exceptions.InvalidSkuException;
 import product.exceptions.InvoiceFileNotException;
@@ -31,12 +35,17 @@ public class Main {
         System.out.println("\nTEST D: NORMAL FLOW");
         System.out.println("-------------------");
         testNormalFlow();
+
+        System.out.println("\nTEST F: ENUM USAGE");
+        System.out.println("------------------");
+        testEnumUsage();
     }
+
 
     //Empty SKU
     static void testInvalidSku() {
         try {
-            Product p1 = new PhysicalProduct("", 1, "Test", 100, "Test",
+            Product p1 = new PhysicalProduct("", 1, "Test", 100, ProductCategory.ELECTRONICS,
                     1.0, false, 10);
         } catch (InvalidSkuException e) {
             System.out.println("Empty sku: " + e.getMessage());
@@ -44,7 +53,7 @@ public class Main {
 
         //Null SKU
         try {
-            Product p2 = new PhysicalProduct(null, 2, "Test", 100, "Test",
+            Product p2 = new PhysicalProduct(null, 2, "Test", 100, ProductCategory.ELECTRONICS,
                     1.0, false, 10);
         } catch (Exception e) {
             System.out.println("Null sku: " + e.getMessage());
@@ -52,7 +61,7 @@ public class Main {
 
         // Invalid format - Non PRD version
         try {
-            Product p3 = new PhysicalProduct("PROD-123", 3, "Test", 100, "Test",
+            Product p3 = new PhysicalProduct("PROD-123", 3, "Test", 100, ProductCategory.ELECTRONICS,
                     1.0, false, 10);
         } catch (InvalidSkuException e) {
             System.out.println("Invalid format: " + e.getMessage());
@@ -60,7 +69,7 @@ public class Main {
 
         // PRD- yes, but no number
         try {
-            Product p4 = new PhysicalProduct("PRD-", 4, "Test", 100, "Test",
+            Product p4 = new PhysicalProduct("PRD-", 4, "Test", 100, ProductCategory.ELECTRONICS,
                     1.0, false, 10);
         } catch (InvalidSkuException e) {
             System.out.println("Non-Number SKU: " + e.getMessage());
@@ -68,7 +77,7 @@ public class Main {
 
         // Acceptable SKU
         try {
-            Product p5 = new PhysicalProduct("PRD-1000", 5, "Test", 100, "Test",
+            Product p5 = new PhysicalProduct("PRD-1000", 5, "Test", 100, ProductCategory.ELECTRONICS,
                     1.0, false, 10);
             System.out.println("Acceptable SKU created: " + p5.sku);
         } catch (InvalidSkuException e) {
@@ -80,7 +89,7 @@ public class Main {
 
         //Bigger than 80% discount
         try {
-            Product p1 = new PhysicalProduct("PRD-3001", 3001, "Test", 100, "Test",
+            Product p1 = new PhysicalProduct("PRD-3001", 3001, "Test", 100, ProductCategory.ELECTRONICS,
                     1.0, false, 10);
             Discountable d1 = (Discountable) p1;
             double price = d1.applyDiscount(90);
@@ -92,7 +101,7 @@ public class Main {
         // Negative discount
         try {
             Product p2 = new DigitalProduct("PRD-3002", 3002, "Test", 100,
-                    "Software", 1.0, "Personal", "Windows", 4);
+                    ProductCategory.SERVICES, 1.0, LicenseType.PERSONAL, Platforms.WINDOWS, 4);
             Discountable d2 = (Discountable) p2;
             double price = d2.applyDiscount(-10);
             System.out.println("Price: " + price);
@@ -103,7 +112,7 @@ public class Main {
         // 50% discount (Normal discount)
         try {
             Product p3 = new SubscriptionProduct("PRD-3003", 3003, "Test", 100,
-                    "Digital", 6, false, 50);
+                    ProductCategory.SERVICES, 6, false, 50);
             Discountable d3 = (Discountable) p3;
             double price = d3.applyDiscount(50);
             System.out.println("%50 discount: " + price + "AZN");
@@ -117,14 +126,14 @@ public class Main {
 
         //Stock = 0
         try {
-            Product p1 = new PhysicalProduct("PRD-4001", 4001, "Out of Stock", 500,
-                    "Electronic", 1.0, false, 0);
+            Product p1 = new PhysicalProduct("PRD-4001", 4001, "Out of Stock item   ", 500,
+                    ProductCategory.ELECTRONICS, 1.0, false, 0);
             card.add(p1);
             System.out.println("Product added: " + p1.sku + ", stock: " + p1.getStock());
 
             //Stock = 5
-            Product p2 = new PhysicalProduct("PRD-4002", 4002, "In the stock", 250,
-                    "Electronic", 1.0, false, 5);
+            Product p2 = new PhysicalProduct("PRD-4002", 4002, "Low stock item", 250,
+                    ProductCategory.ELECTRONICS, 1.0, false, 5);
             card.add(p2);
             System.out.println("Product added: " + p2.sku + ", stock: " + p2.getStock());
 
@@ -144,22 +153,22 @@ public class Main {
 
         try {
             Product d1 = new DigitalProduct("PRD-1001", 101, "McAfee Antivirus", 65,
-                    "Software", 356, "Business", "Windows", 100);
+                    ProductCategory.SERVICES, 356, LicenseType.BUSINESS, Platforms.WINDOWS, 100);
 
             Product d2 = new DigitalProduct("PRD-1002", 102, "Adobe Creative Cloud Pro", 70,
-                    "Software", 958, "Business", "Mac", 90);
+                    ProductCategory.SERVICES, 958, LicenseType.BUSINESS, Platforms.MACOS, 90);
 
             Product d3 = new PhysicalProduct("PRD-1003", 103, "Apple Watch Series 11", 1169,
-                    "Electronics", 65, true, 110);
+                    ProductCategory.ELECTRONICS, 65, true, 110);
 
             Product d4 = new PhysicalProduct("PRD-1004", 104, "Samsung Galaxy S25 Ultra", 2499,
-                    "Electronics", 218, false, 80);
+                    ProductCategory.ELECTRONICS, 218, false, 80);
 
             Product d5 = new SubscriptionProduct("PRD-1005", 105, "Netflix Subscription", 10,
-                    "Entertainment", 12, true, 1000);
+                    ProductCategory.SERVICES, 12, true, 1000);
 
             Product giftCard = new GiftCard("PRD-1006", 106, "Gift Card", 50,
-                    "Gift", 100, 10000);
+                    ProductCategory.SERVICES, 100, 10000);
 
             card.add(d1);
             card.add(d2);
@@ -225,6 +234,94 @@ public class Main {
 
         System.out.println("Processing invoice: " + filePath);
         service.printInvoice(filePath);
+    }
+
+    static void testEnumUsage(){
+
+        System.out.println("Test 1: DigitalProduct with product.enums");
+        System.out.println("---------------------------------");
+        Product p1 = new DigitalProduct(
+                "PRD-1",
+                1,
+                "Photoshop",
+                50,
+                ProductCategory.SERVICES,
+                100,
+                LicenseType.BUSINESS,
+                Platforms.WINDOWS,
+                10
+        );
+        System.out.println("Created: " + p1.sku);
+        System.out.println("Category: " + p1.label());
+        System.out.println("Final price: " + p1.finalPrice() + "AZN");
+
+        System.out.println("\nTest 2: PhysicalProduct with City enum");
+        System.out.println("---------------------------------------");
+        PhysicalProduct p2 = new PhysicalProduct(
+                "PRD-2",
+                2,
+                "Laptop",
+                1200,
+                ProductCategory.ELECTRONICS,
+                2.5,
+                true,
+                5
+        );
+
+        double priceForBaku = p2.finalPrice(10, Cities.BAKU);
+        double priceForGanja = p2.finalPrice(10, Cities.GANJA);
+        double priceForOther = p2.finalPrice(10, Cities.OTHER);
+
+        System.out.println("Created: " + p2.sku);
+        System.out.println("Price with 10% discount:");
+        System.out.println("  - BAKU: " + priceForBaku + " AZN");
+        System.out.println("  - GANJA: " + priceForGanja + " AZN");
+        System.out.println("  - OTHER: " + priceForOther + " AZN");
+
+        // Test 3: Enum values() metodu
+        System.out.println("\nTest 3: All ProductCategory values");
+        System.out.println("-----------------------------------");
+        for (ProductCategory cat : ProductCategory.values()) {
+            System.out.println("- " + cat.name() + " (ordinal: " + cat.ordinal() + ")");
+        }
+
+        // Test 4: Enum valueOf() metodu
+        System.out.println("\nTest 4: Convert String to enum");
+        System.out.println("-------------------------------");
+        try {
+            ProductCategory cat1 = ProductCategory.valueOf("ELECTRONICS");
+            System.out.println("Valid: " + cat1);
+
+            ProductCategory cat2 = ProductCategory.valueOf("INVALID");
+            System.out.println("This won't print");
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid enum value: " + e.getMessage());
+        }
+
+        // Test 5: Enum müqayisəsi
+        System.out.println("\nTest 5: Enum comparison");
+        System.out.println("------------------------");
+        LicenseType lic1 = LicenseType.BUSINESS;
+        LicenseType lic2 = LicenseType.BUSINESS;
+        LicenseType lic3 = LicenseType.PERSONAL;
+
+        System.out.println("lic1 == lic2: " + (lic1 == lic2));           // true
+        System.out.println("lic1.equals(lic2): " + lic1.equals(lic2));   // true
+        System.out.println("lic1 == lic3: " + (lic1 == lic3));           // false
+
+        // Test 6: Switch with enum
+        System.out.println("\nTest 6: Switch with enum");
+        System.out.println("-------------------------");
+        Platforms platform = Platforms.MACOS;
+
+        String message = switch (platform) {
+            case WINDOWS -> "Operating System: Microsoft Windows";
+            case MACOS -> "Operating System: Apple macOS";
+            case LINUX -> "Operating System: GNU/Linux";
+        };
+
+        System.out.println(message);
     }
 }
 

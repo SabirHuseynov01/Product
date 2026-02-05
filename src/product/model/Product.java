@@ -1,5 +1,6 @@
 package product.model;
 
+import product.enums.ProductCategory;
 import product.exceptions.InvalidSkuException;
 import product.exceptions.OutOfStockException;
 
@@ -8,10 +9,11 @@ public abstract class Product {
     protected long id;
     protected String name;
     protected double basePrice;
-    protected String category;
+    protected ProductCategory category;
     private int stock;
 
-    public Product(String sku, long id, String name, double basePrice, String category, int stock) {
+    public Product(String sku, long id, String name, double basePrice,
+                   ProductCategory category, int stock) {
 
         if (sku == null || sku.isEmpty()) {
             throw new InvalidSkuException("SKU is empty");
@@ -40,7 +42,7 @@ public abstract class Product {
     }
 
     public final String shortInfo() {
-        return sku + " | " + name + " | " + category;
+        return sku + " | " + name + " | " + category.name();
     }
 
     public double finalPrice() {
@@ -58,7 +60,7 @@ public abstract class Product {
     }
 
     public String label() {
-        return "Product: " + name + " | " + category;
+        return "Product: " + name + " | " + category.name();
     }
 
     public int getStock() {
@@ -83,7 +85,7 @@ public abstract class Product {
         return "sku=" + sku +
                 "id=" + id +
                 " name=" + name +
-                " category=" + category +
+                " category=" + category.name() +
                 " basePrice=" + basePrice +
                 " stock=" + stock +
                 " finalPrice='" + finalPrice();

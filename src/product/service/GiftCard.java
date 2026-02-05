@@ -1,11 +1,12 @@
 package product.service;
 
+import product.enums.ProductCategory;
 import product.model.Product;
 
 public final class GiftCard extends Product {
     double amount;
 
-    public GiftCard(String sku, long id, String name, double basePrice, String category,
+    public GiftCard(String sku, long id, String name, double basePrice, ProductCategory category,
                     double amount, int stock) {
         super(sku, id, name, basePrice, category, stock);
         this.amount = amount;

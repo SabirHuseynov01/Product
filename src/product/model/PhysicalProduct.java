@@ -1,5 +1,7 @@
 package product.model;
 
+import product.enums.Cities;
+import product.enums.ProductCategory;
 import product.exceptions.InvalidDiscountException;
 import product.interfaces.Discountable;
 import product.interfaces.Shippable;
@@ -8,7 +10,7 @@ public class PhysicalProduct extends Product implements Shippable, Discountable 
     private double weightKQ;
     private boolean isFragile;
 
-    public PhysicalProduct(String sku, long id, String name, double basePrice, String category,
+    public PhysicalProduct(String sku, long id, String name, double basePrice, ProductCategory category,
                            double weightKQ, boolean isFragile,int stock) {
         super(sku, id, name, basePrice, category, stock);
         this.weightKQ = weightKQ;
@@ -33,6 +35,21 @@ public class PhysicalProduct extends Product implements Shippable, Discountable 
     @Override
     public String getType() {
         return "PHYSICAL";
+    }
+
+    public double finalPrice(double discountPercent, Cities city) {
+        double discount = basePrice * (1 - discountPercent / 100.0);
+                double deliveryFee = switch (city) {
+                    case BAKU -> 3.0;
+                    case GANJA -> 6.0;
+                    case OTHER -> 10.0;
+                };
+        double total = discount + deliveryFee;
+        if (isFragile) {
+            total += 7; //Paketlenme miqdari
+            total += 2; //Ekstra paketlenme miqdari
+        }
+        return total;
     }
 
     double finalPrice(double discountPercent, String city) {

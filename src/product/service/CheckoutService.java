@@ -1,5 +1,6 @@
 package product.service;
 
+import product.enums.LicenseType;
 import product.exceptions.InvalidDiscountException;
 import product.exceptions.InvoiceFileNotException;
 import product.exceptions.InvoiceReadException;
@@ -21,7 +22,7 @@ public class CheckoutService {
 
         } else if (product instanceof DigitalProduct) {
             DigitalProduct digitalProduct = (DigitalProduct) product;
-            if ("BUSINESS".equalsIgnoreCase(digitalProduct.getLicenseType())) {
+            if (digitalProduct.getLicenseType() == LicenseType.BUSINESS) {
                 System.out.println("Business license verified for " + digitalProduct.sku);
             }
 

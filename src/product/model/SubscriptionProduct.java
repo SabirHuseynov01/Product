@@ -1,5 +1,6 @@
 package product.model;
 
+import product.enums.ProductCategory;
 import product.exceptions.InvalidDiscountException;
 import product.interfaces.Discountable;
 
@@ -7,7 +8,7 @@ public class SubscriptionProduct extends Product implements Discountable {
     public int months;
     public boolean autoRenew;
 
-    public SubscriptionProduct(String sku, long id, String name, double basePrice, String category,
+    public SubscriptionProduct(String sku, long id, String name, double basePrice, ProductCategory category,
                                int months, boolean autoRenew, int stock) {
         super(sku, id, name, basePrice, category, stock);
         this.months = months;

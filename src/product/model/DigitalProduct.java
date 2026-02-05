@@ -1,15 +1,18 @@
 package product.model;
 
+import product.enums.LicenseType;
+import product.enums.Platforms;
+import product.enums.ProductCategory;
 import product.exceptions.InvalidDiscountException;
 import product.interfaces.Discountable;
 
 public class DigitalProduct extends Product implements Discountable {
     private double fileSizeMB;
-    private String licenseType;
-    private String platform;
+    private LicenseType licenseType;
+    private Platforms platform;
 
-    public DigitalProduct(String sku, long id, String name, double basePrice, String category,
-                          double fileSizeMB, String licenseType, String platform, int stock) {
+    public DigitalProduct(String sku, long id, String name, double basePrice, ProductCategory category,
+                          double fileSizeMB, LicenseType licenseType, Platforms platform, int stock) {
         super(sku,id, name, basePrice, category, stock);
         this.fileSizeMB = fileSizeMB;
         this.licenseType = licenseType;
@@ -20,23 +23,23 @@ public class DigitalProduct extends Product implements Discountable {
         return fileSizeMB;
     }
 
-    public String getLicenseType() {
+    public LicenseType getLicenseType() {
         return licenseType;
     }
 
-    public String getPlatform() {
+    public Platforms getPlatform() {
         return platform;
     }
 
     public double finalPrice() {
-        if ("BUSINESS".equalsIgnoreCase(licenseType)){
+        if (licenseType == LicenseType.BUSINESS){
             return basePrice * 1.25;
         }
         return basePrice;
     }
 
     public String label() {
-        return "Digital Product: " + name + " | " + licenseType;
+        return "Digital Product: " + name + " | " + licenseType.name();
     }
 
     @Override
