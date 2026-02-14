@@ -16,6 +16,9 @@ import product.model.SubscriptionProduct;
 import product.service.Card;
 import product.service.CheckoutService;
 import product.service.GiftCard;
+import product.validation.ReflectionReport;
+import product.validation.ValidationException;
+import product.validation.Validator;
 
 public class Main {
     static void main() {
@@ -39,6 +42,14 @@ public class Main {
         System.out.println("\nTEST F: ENUM USAGE");
         System.out.println("------------------");
         testEnumUsage();
+
+        System.out.println("\nTEST G: ANNOTATION VALIDATION");
+        System.out.println("------------------------------");
+        testAnnotationValidation();
+
+        System.out.println("\nTEST H: REFLECTION REPORT");
+        System.out.println("-------------------------");
+        testReflectionReport();
     }
 
 
@@ -323,5 +334,126 @@ public class Main {
 
         System.out.println(message);
     }
+
+    static void testReflectionReport(){
+        ReflectionReport.printReport(PhysicalProduct.class);
+        ReflectionReport.printReport(DigitalProduct.class);
+        ReflectionReport.printReport(SubscriptionProduct.class);
+        ReflectionReport.printReport(Product.class);
+    }
+
+    static void testAnnotationValidation(){
+        System.out.println("Test A: Valid product");
+        System.out.println("---------------------");
+
+        try {
+            Product p1 = new PhysicalProduct(
+                    "PRD-1", 1, "Test", 100, ProductCategory.ELECTRONICS,
+                    1.0, false, 10);
+
+            Validator.validate(p1);
+            System.out.println("Validation passed: " + p1.sku);
+        }catch (ValidationException e){
+            System.out.println("Validation failed: " + e.getMessage());
+        }
+
+        // B) Səhv SKU
+        System.out.println("\nTest B: Invalid SKU format");
+        System.out.println("--------------------------");
+        try {
+            Product p2 = new DigitalProduct(
+                    "ABC-1",  // ❌ Səhv format
+                    101,
+                    "Invalid SKU Product",
+                    50,
+                    ProductCategory.SERVICES,
+                    100,
+                    LicenseType.PERSONAL,
+                    Platforms.WINDOWS,
+                    10
+            );
+
+            Validator.validate(p2);
+            System.out.println("Validation passed - UNEXPECTED!");
+
+        } catch (InvalidSkuException e) {
+            System.out.println("Constructor rejected: " + e.getMessage());
+        } catch (ValidationException e) {
+            System.out.println("Validator rejected: " + e.getMessage());
+        }
+
+        // C) Negative price
+        System.out.println("\nTest C: Negative price");
+        System.out.println("----------------------");
+        System.out.println("(Cannot create - constructor validates basePrice range)");
+
+        // D) Subscription months = 0
+        System.out.println("\nTest D: Subscription with months=0");
+        System.out.println("-----------------------------------");
+        try {
+            Product p4 = new SubscriptionProduct(
+                    "PRD-103",
+                    103,
+                    "Invalid Subscription",
+                    10,
+                    ProductCategory.SERVICES,
+                    0,  // ❌ months=0 (min=1)
+                    true,
+                    100
+            );
+
+            Validator.validate(p4);
+            System.out.println("Validation passed - UNEXPECTED!");
+
+        } catch (ValidationException e) {
+            System.out.println("Validation failed: " + e.getMessage());
+        }
+
+        // E) Weight out of range
+        System.out.println("\nTest E: Weight out of range");
+        System.out.println("---------------------------");
+        try {
+            Product p5 = new PhysicalProduct(
+                    "PRD-104",
+                    104,
+                    "Heavy Product",
+                    500,
+                    ProductCategory.ELECTRONICS,
+                    250,  // ❌ max=200
+                    false,
+                    10
+            );
+
+            Validator.validate(p5);
+            System.out.println("Validation passed - UNEXPECTED!");
+
+        } catch (ValidationException e) {
+            System.out.println("Validation failed: " + e.getMessage());
+        }
+
+        // F) File size too large
+        System.out.println("\nTest F: File size too large");
+        System.out.println("----------------------------");
+        try {
+            Product p6 = new DigitalProduct(
+                    "PRD-105",
+                    105,
+                    "Huge File",
+                    100,
+                    ProductCategory.SERVICES,
+                    600000,  // ❌ max=500000
+                    LicenseType.BUSINESS,
+                    Platforms.MACOS,
+                    5
+            );
+
+            Validator.validate(p6);
+            System.out.println("Validation passed - UNEXPECTED!");
+
+        } catch (ValidationException e) {
+            System.out.println("Validation failed: " + e.getMessage());
+        }
+    }
+
 }
 

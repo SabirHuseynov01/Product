@@ -1,10 +1,13 @@
 package product.model;
 
+import product.annotations.Range;
 import product.enums.ProductCategory;
 import product.exceptions.InvalidDiscountException;
 import product.interfaces.Discountable;
 
 public class SubscriptionProduct extends Product implements Discountable {
+
+    @Range(min = 1, max = 36, message = "Months must be between 1 and 36")
     public int months;
     public boolean autoRenew;
 

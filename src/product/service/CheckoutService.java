@@ -11,6 +11,8 @@ import product.model.DigitalProduct;
 import product.model.PhysicalProduct;
 import product.model.Product;
 import product.model.SubscriptionProduct;
+import product.validation.ValidationException;
+import product.validation.Validator;
 
 public class CheckoutService {
     void applySpecialRules(Product product) {
@@ -43,6 +45,14 @@ public class CheckoutService {
 
         for (int i = 0; i < card.size; i++) {
             Product product = card.items[i];
+
+            try {
+                Validator.validate(product);
+            }catch (ValidationException e) {
+                System.out.println("Validation error: " + product.shortInfo() + ": " + e.getMessage());
+                System.out.println("------------");
+                continue;
+            }
 
             try {
                 product.reserve(1);

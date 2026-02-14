@@ -1,5 +1,6 @@
 package product.model;
 
+import product.annotations.Range;
 import product.enums.Cities;
 import product.enums.ProductCategory;
 import product.exceptions.InvalidDiscountException;
@@ -7,6 +8,7 @@ import product.interfaces.Discountable;
 import product.interfaces.Shippable;
 
 public class PhysicalProduct extends Product implements Shippable, Discountable {
+    @Range(min = 0.1, max = 200, message = "Weight must be between 0.1 and 200 kg")
     private double weightKQ;
     private boolean isFragile;
 

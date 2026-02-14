@@ -1,15 +1,27 @@
 package product.model;
 
+import product.annotations.NotBlank;
+import product.annotations.Range;
+import product.annotations.SkuFormat;
 import product.enums.ProductCategory;
 import product.exceptions.InvalidSkuException;
 import product.exceptions.OutOfStockException;
 
 public abstract class Product {
+    @NotBlank(message = "SKU cannot be blank")
+    @SkuFormat(message = "SKU must match PRD-<digits> format")
     public final String sku;
+
     protected long id;
+
+    @NotBlank(message = "Product name cannot be blank")
     protected String name;
+
+    @Range(min = 0, max = 100000, message = "Price must be between 0 and 100000")
     protected double basePrice;
     protected ProductCategory category;
+
+    @Range(min = 0, max = 10000000, message = "Stock must be between 0 and 10000000")
     private int stock;
 
     public Product(String sku, long id, String name, double basePrice,

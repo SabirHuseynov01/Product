@@ -1,5 +1,6 @@
 package product.model;
 
+import product.annotations.Range;
 import product.enums.LicenseType;
 import product.enums.Platforms;
 import product.enums.ProductCategory;
@@ -7,6 +8,8 @@ import product.exceptions.InvalidDiscountException;
 import product.interfaces.Discountable;
 
 public class DigitalProduct extends Product implements Discountable {
+
+    @Range(min = 1, max = 500000, message = "File size must be between 0.1 and 500000 MB")
     private double fileSizeMB;
     private LicenseType licenseType;
     private Platforms platform;
