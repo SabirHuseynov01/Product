@@ -8,6 +8,10 @@ import product.exceptions.InvalidDiscountException;
 import product.exceptions.InvalidSkuException;
 import product.exceptions.InvoiceFileNotException;
 import product.exceptions.InvoiceReadException;
+import product.generic.Box;
+import product.generic.InMemoryRepository;
+import product.generic.PricingUtils;
+import product.generic.Repository;
 import product.interfaces.Discountable;
 import product.model.DigitalProduct;
 import product.model.PhysicalProduct;
@@ -19,6 +23,9 @@ import product.service.GiftCard;
 import product.validation.ReflectionReport;
 import product.validation.ValidationException;
 import product.validation.Validator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     static void main() {
@@ -50,6 +57,22 @@ public class Main {
         System.out.println("\nTEST H: REFLECTION REPORT");
         System.out.println("-------------------------");
         testReflectionReport();
+
+        System.out.println("\nTEST I: GENERICS - BOX");
+        System.out.println("----------------------");
+        testGenericsBox();
+
+        System.out.println("\nTEST J: GENERICS - REPOSITORY");
+        System.out.println("-----------------------------");
+        testGenericsRepository();
+
+        System.out.println("\nTEST K: GENERICS - PRICING UTILS");
+        System.out.println("--------------------------------");
+        testGenericsPricingUtils();
+
+        System.out.println("\nTEST L: GENERICS - WILDCARDS");
+        System.out.println("----------------------------");
+        testGenericsWildcards();
     }
 
 
@@ -453,6 +476,185 @@ public class Main {
         } catch (ValidationException e) {
             System.out.println("Validation failed: " + e.getMessage());
         }
+    }
+
+    static void testGenericsBox() {
+
+        // Test 1: Box<Product>
+        System.out.println("Test 1: Box<Product>");
+        System.out.println("--------------------");
+        Box<Product> productBox = new Box<>();
+
+        Product p1 = new DigitalProduct("PRD-2001", 1, "Boxed Digital", 100,
+                ProductCategory.SERVICES, 500, LicenseType.PERSONAL, Platforms.WINDOWS, 10);
+
+        System.out.println("Box is empty: " + productBox.isEmpty());
+        productBox.put(p1);
+        System.out.println("Box is empty: " + productBox.isEmpty());
+
+        Product retrieved = productBox.get();
+        System.out.println("Retrieved from box: " + retrieved.sku);
+        System.out.println(productBox);
+
+        // Test 2: Box<DigitalProduct>
+        System.out.println("\nTest 2: Box<DigitalProduct>");
+        System.out.println("---------------------------");
+        Box<DigitalProduct> digitalBox = new Box<>();
+
+        DigitalProduct d1 = new DigitalProduct("PRD-2002", 2, "Specific Digital", 200,
+                ProductCategory.SERVICES, 1000, LicenseType.BUSINESS, Platforms.MACOS, 5);
+
+        digitalBox.put(d1);
+        DigitalProduct retrievedDigital = digitalBox.get();
+        System.out.println("Retrieved digital: " + retrievedDigital.sku);
+        System.out.println("License: " + retrievedDigital.getLicenseType());
+
+        // Test 3: Box<GiftCard>
+        System.out.println("\nTest 3: Box<GiftCard>");
+        System.out.println("---------------------");
+        Box<GiftCard> giftBox = new Box<>();
+
+        GiftCard gift = new GiftCard("PRD-2003", 3, "Boxed Gift", 50,
+                ProductCategory.SERVICES, 100, 100);
+
+        giftBox.put(gift);
+        GiftCard retrievedGift = giftBox.get();
+        System.out.println("Retrieved gift card: " + retrievedGift.sku);
+    }
+
+    static void testGenericsRepository() {
+
+        // Test 1: Repository<Product>
+        System.out.println("Test 1: Repository<Product>");
+        System.out.println("---------------------------");
+        Repository<Product> productRepo = new InMemoryRepository<>();
+
+        Product p1 = new PhysicalProduct("PRD-3001", 1, "Laptop", 1200,
+                ProductCategory.ELECTRONICS, 2.5, false, 10);
+
+        Product p2 = new DigitalProduct("PRD-3002", 2, "Software", 50,
+                ProductCategory.SERVICES, 100, LicenseType.PERSONAL, Platforms.WINDOWS, 20);
+
+        Product p3 = new SubscriptionProduct("PRD-3003", 3, "Streaming", 10,
+                ProductCategory.SERVICES, 12, true, 100);
+
+        productRepo.save(p1);
+        productRepo.save(p2);
+        productRepo.save(p3);
+
+        System.out.println("Saved 3 products");
+
+        Product found = productRepo.findBySku("PRD-3002");
+        if (found != null) {
+            System.out.println("Found: " + found.shortInfo());
+        }
+
+        Product notFound = productRepo.findBySku("PRD-NONEXISTENT");
+        System.out.println("Not found is null: " + (notFound == null));
+
+        Product[] all = productRepo.findAll();
+        System.out.println("Total products in repo: " + all.length);
+        for (Product p : all) {
+            System.out.println("  - " + p.sku);
+        }
+
+        // Test 2: Repository<DigitalProduct>
+        System.out.println("\nTest 2: Repository<DigitalProduct>");
+        System.out.println("----------------------------------");
+        InMemoryRepository<DigitalProduct> digitalRepo = new InMemoryRepository<>();
+
+        DigitalProduct d1 = new DigitalProduct("PRD-3010", 10, "Photoshop", 300,
+                ProductCategory.SERVICES, 2000, LicenseType.BUSINESS, Platforms.MACOS, 5);
+
+        DigitalProduct d2 = new DigitalProduct("PRD-3011", 11, "Antivirus", 80,
+                ProductCategory.SERVICES, 150, LicenseType.PERSONAL, Platforms.WINDOWS, 50);
+
+        digitalRepo.save(d1);
+        digitalRepo.save(d2);
+
+        DigitalProduct foundDigital = digitalRepo.findBySku("PRD-3010");
+        if (foundDigital != null) {
+            System.out.println("Found digital: " + foundDigital.shortInfo());
+            System.out.println("License: " + foundDigital.getLicenseType());
+        }
+    }
+
+    static void testGenericsPricingUtils() {
+
+        // Test 1: maxByFinalPrice
+        System.out.println("Test 1: maxByFinalPrice");
+        System.out.println("-----------------------");
+
+        Product[] products = new Product[4];
+        products[0] = new PhysicalProduct("PRD-4001", 1, "Cheap Item", 50,
+                ProductCategory.ELECTRONICS, 1.0, false, 10);
+        products[1] = new PhysicalProduct("PRD-4002", 2, "Expensive Item", 2000,
+                ProductCategory.ELECTRONICS, 5.0, true, 5);
+        products[2] = new DigitalProduct("PRD-4003", 3, "Software", 100,
+                ProductCategory.SERVICES, 500, LicenseType.BUSINESS, Platforms.WINDOWS, 20);
+        products[3] = new SubscriptionProduct("PRD-4004", 4, "Service", 10,
+                ProductCategory.SERVICES, 12, true, 100);
+
+        Product max = PricingUtils.maxByFinalPrice(products);
+        if (max != null) {
+            System.out.println("Most expensive: " + max.sku);
+            System.out.println("Price: " + max.finalPrice() + " AZN");
+        }
+    }
+
+    static void testGenericsWildcards() {
+
+        // Test 1: sumFinalPrices with List<Product>
+        System.out.println("Test 1: sumFinalPrices - List<Product>");
+        System.out.println("---------------------------------------");
+
+        List<Product> productList = new ArrayList<>();
+        productList.add(new PhysicalProduct("PRD-5001", 1, "Item 1", 100,
+                ProductCategory.ELECTRONICS, 1.0, false, 10));
+        productList.add(new PhysicalProduct("PRD-5002", 2, "Item 2", 200,
+                ProductCategory.ELECTRONICS, 2.0, false, 10));
+        productList.add(new DigitalProduct("PRD-5003", 3, "Item 3", 50,
+                ProductCategory.SERVICES, 100, LicenseType.PERSONAL, Platforms.WINDOWS, 10));
+
+        double sum1 = PricingUtils.sumFinalPrices(productList);
+        System.out.println("Sum of Product list: " + sum1 + " AZN");
+
+        // Test 2: sumFinalPrices with List<DigitalProduct>
+        System.out.println("\nTest 2: sumFinalPrices - List<DigitalProduct>");
+        System.out.println("---------------------------------------------");
+
+        List<DigitalProduct> digitalList = new ArrayList<>();
+        digitalList.add(new DigitalProduct("PRD-5010", 10, "Digital 1", 100,
+                ProductCategory.SERVICES, 500, LicenseType.BUSINESS, Platforms.MACOS, 5));
+        digitalList.add(new DigitalProduct("PRD-5011", 11, "Digital 2", 200,
+                ProductCategory.SERVICES, 1000, LicenseType.PERSONAL, Platforms.WINDOWS, 10));
+
+        double sum2 = PricingUtils.sumFinalPrices(digitalList);
+        System.out.println("Sum of DigitalProduct list: " + sum2 + " AZN");
+
+        // Test 3: addDefaultGiftCard to List<GiftCard>
+        System.out.println("\nTest 3: addDefaultGiftCard - List<GiftCard>");
+        System.out.println("-------------------------------------------");
+
+        List<GiftCard> giftList = new ArrayList<>();
+        System.out.println("Gift list size before: " + giftList.size());
+
+        PricingUtils.addDefaultGiftCard(giftList);
+        System.out.println("Gift list size after: " + giftList.size());
+        System.out.println("Added gift card: " + giftList.get(0).sku);
+
+        // Test 4: addDefaultGiftCard to List<Product>
+        System.out.println("\nTest 4: addDefaultGiftCard - List<Product>");
+        System.out.println("------------------------------------------");
+
+        List<Product> mixedList = new ArrayList<>();
+        mixedList.add(new PhysicalProduct("PRD-5020", 1, "Physical", 100,
+                ProductCategory.ELECTRONICS, 1.0, false, 10));
+
+        System.out.println("Mixed list size before: " + mixedList.size());
+        PricingUtils.addDefaultGiftCard(mixedList);
+        System.out.println("Mixed list size after: " + mixedList.size());
+        System.out.println("Last item: " + mixedList.get(mixedList.size() - 1).sku);
     }
 }
 
