@@ -656,6 +656,8 @@ public class Main {
         System.out.println("Mixed list size after: " + mixedList.size());
         System.out.println("Last item: " + mixedList.get(mixedList.size() - 1).sku);
         System.out.println("Hello world");
+        System.out.println("Hello world");
+
     }
 }
 
